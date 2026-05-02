@@ -20,8 +20,8 @@ export async function main(args) {
   process.on("SIGINT", handleProcessTermination);
   process.on("SIGTERM", handleProcessTermination);
 
-  const proxy = createSafeChainProxy();
-  await proxy.startServer();
+  /** @type {ReturnType<import("./registryProxy/registryProxy.js").createSafeChainProxy> | undefined} */
+  let proxy;
 
   // Global error handlers to log unhandled errors
   process.on("uncaughtException", (error) => {
@@ -44,6 +44,19 @@ export async function main(args) {
     // This parses all the --safe-chain arguments and removes them from the args array
     args = initializeCliArguments(args);
 
+    const packageManager = getPackageManager();
+    if (
+      typeof packageManager.shouldPassThroughWithoutProxy === "function" &&
+      typeof packageManager.runPassThrough === "function" &&
+      packageManager.shouldPassThroughWithoutProxy(args)
+    ) {
+      const directResult = await packageManager.runPassThrough(args);
+      return directResult.status;
+    }
+
+    proxy = createSafeChainProxy();
+    await proxy.startServer();
+
     if (shouldScanCommand(args)) {
       const commandScanResult = await scanCommand(args);
 
@@ -59,7 +72,7 @@ export async function main(args) {
     // Not doing this could cause bugs to disappear when cursor movement codes
     //  are written by the package manager while safe-chain is writing logs
     ui.startBufferingLogs();
-    const packageManagerResult = await getPackageManager().runCommand(args);
+    const packageManagerResult = await packageManager.runCommand(args);
 
     // Write all buffered logs
     ui.writeBufferedLogsAndStopBuffering();
@@ -105,7 +118,9 @@ export async function main(args) {
     //  to be awaited in the bin files and return the correct exit code
     return 1;
   } finally {
-    await proxy.stopServer();
+    if (proxy) {
+      await proxy.stopServer();
+    }
   }
 }
 

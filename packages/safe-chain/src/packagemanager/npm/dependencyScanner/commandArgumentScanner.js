@@ -30,7 +30,12 @@ export function commandArgumentScanner(opts) {
 
   return {
     scan: (args) => scanDependencies(args),
-    shouldScan: (args) => shouldScanDependencies(args, ignoreDryRun),
+    /**
+     * @param {string[]} tailArgs argv after global flags (subcommand-first)
+     * @param {string[]} [fullArgs] original argv for `--dry-run` etc. before the subcommand
+     */
+    shouldScan: (tailArgs, fullArgs = tailArgs) =>
+      shouldScanDependencies(fullArgs, ignoreDryRun),
   };
 }
 

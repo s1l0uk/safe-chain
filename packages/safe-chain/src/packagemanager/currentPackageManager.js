@@ -34,6 +34,8 @@ const state = {
  * @property {(args: string[]) => Promise<{ status: number }>} runCommand
  * @property {(args: string[]) => boolean} isSupportedCommand
  * @property {(args: string[]) => Promise<GetDependencyUpdatesResult[]> | GetDependencyUpdatesResult[]} getDependencyUpdatesForCommand
+ * @property {(args: string[]) => boolean} [shouldPassThroughWithoutProxy] If true, run the tool without starting the registry proxy.
+ * @property {(args: string[]) => Promise<{ status: number }>} [runPassThrough] Direct spawn used when shouldPassThroughWithoutProxy applies.
  */
 
 /**
