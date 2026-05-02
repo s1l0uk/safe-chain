@@ -1,5 +1,6 @@
+import { getPmTailArgs } from "../_shared/getPmTailArgs.js";
 import { commandArgumentScanner } from "./dependencyScanner/commandArgumentScanner.js";
-import { runYarnCommand } from "./runYarnCommand.js";
+import { runYarnCommand, runYarnCommandWithoutProxy } from "./runYarnCommand.js";
 
 const scanner = commandArgumentScanner();
 
@@ -10,15 +11,28 @@ export function createYarnPackageManager() {
   return {
     runCommand: runYarnCommand,
     isSupportedCommand: (args) =>
-      matchesCommand(args, "add") ||
-      matchesCommand(args, "global", "add") ||
-      matchesCommand(args, "install") ||
-      matchesCommand(args, "up") ||
-      matchesCommand(args, "upgrade") ||
-      matchesCommand(args, "global", "upgrade") ||
-      matchesCommand(args, "dlx"),
-    getDependencyUpdatesForCommand: (args) => scanner.scan(args),
+      yarnNeedsScan(getPmTailArgs(args)),
+    getDependencyUpdatesForCommand: (args) => scanner.scan(getPmTailArgs(args)),
+    shouldPassThroughWithoutProxy: (args) =>
+      !yarnNeedsScan(getPmTailArgs(args)),
+    runPassThrough: runYarnCommandWithoutProxy,
   };
+}
+
+/**
+ * @param {string[]} tailArgs
+ * @returns {boolean}
+ */
+function yarnNeedsScan(tailArgs) {
+  return (
+    matchesCommand(tailArgs, "add") ||
+    matchesCommand(tailArgs, "global", "add") ||
+    matchesCommand(tailArgs, "install") ||
+    matchesCommand(tailArgs, "up") ||
+    matchesCommand(tailArgs, "upgrade") ||
+    matchesCommand(tailArgs, "global", "upgrade") ||
+    matchesCommand(tailArgs, "dlx")
+  );
 }
 
 /**

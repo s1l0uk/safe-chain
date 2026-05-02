@@ -1,3 +1,4 @@
+import { getPmTailArgs } from "../../_shared/getPmTailArgs.js";
 import { deref } from "./cmd-list.js";
 
 /**
@@ -5,11 +6,12 @@ import { deref } from "./cmd-list.js";
  * @returns {string | null}
  */
 export function getNpmCommandForArgs(args) {
-  if (args.length === 0) {
+  const tail = getPmTailArgs(args);
+  if (tail.length === 0) {
     return null;
   }
 
-  const argCommand = deref(args[0]);
+  const argCommand = deref(tail[0]);
   if (!argCommand) {
     return null;
   }

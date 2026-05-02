@@ -18,3 +18,21 @@ export async function runNpm(args) {
     return reportCommandExecutionFailure(error, "npm");
   }
 }
+
+/**
+ * Runs npm without the registry proxy (e.g. `npm test`). Uses the parent process environment.
+ *
+ * @param {string[]} args
+ * @returns {Promise<{status: number}>}
+ */
+export async function runNpmWithoutProxy(args) {
+  try {
+    const result = await safeSpawn("npm", args, {
+      stdio: "inherit",
+      env: { ...process.env },
+    });
+    return { status: result.status };
+  } catch (/** @type any */ error) {
+    return reportCommandExecutionFailure(error, "npm");
+  }
+}

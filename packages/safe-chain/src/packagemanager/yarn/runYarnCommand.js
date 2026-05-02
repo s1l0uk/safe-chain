@@ -23,6 +23,25 @@ export async function runYarnCommand(args) {
 }
 
 /**
+ * @param {string[]} args
+ * @returns {Promise<{status: number}>}
+ */
+export async function runYarnCommandWithoutProxy(args) {
+  try {
+    const env = { ...process.env };
+    await fixYarnProxyEnvironmentVariables(env);
+
+    const result = await safeSpawn("yarn", args, {
+      stdio: "inherit",
+      env,
+    });
+    return { status: result.status };
+  } catch (/** @type any */ error) {
+    return reportCommandExecutionFailure(error, "yarn");
+  }
+}
+
+/**
  * @param {Record<string, string>} env
  *
  * @returns {Promise<void>}
