@@ -1,5 +1,11 @@
 #!/usr/bin/env node
 
+// Strip PKG_EXECPATH from the environment so any child process safe-chain
+// spawns (npm, uv, pip, …) doesn't inherit it. If it leaks into a subsequent
+// safe-chain invocation (e.g. via a shim) the yao-pkg bootstrap would treat
+// argv[1] as a script path and fail with MODULE_NOT_FOUND.
+delete process.env.PKG_EXECPATH;
+
 import chalk from "chalk";
 import { ui } from "../src/environment/userInteraction.js";
 import { setup } from "../src/shell-integration/setup.js";
@@ -15,7 +21,7 @@ import { main } from "../src/main.js";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
-import { knownAikidoTools } from "../src/shell-integration/helpers.js";
+import { knownAikidoTools, getPackageManagerList } from "../src/shell-integration/helpers.js";
 import { getInstalledSafeChainDir } from "../src/installLocation.js";
 
 /** @type {string} */
@@ -108,7 +114,7 @@ function writeHelp() {
   ui.writeInformation(
     `- ${chalk.cyan(
       "safe-chain setup",
-    )}: This will setup your shell to wrap safe-chain around npm, npx, yarn, pnpm, pnpx, bun, bunx, pip and pip3.`,
+    )}: This will setup your shell to wrap safe-chain around ${getPackageManagerList()}.`,
   );
   ui.writeInformation(
     `- ${chalk.cyan(

@@ -19,6 +19,14 @@ function pnpx
     wrapSafeChainCommand "pnpx" $argv
 end
 
+function rush
+    wrapSafeChainCommand "rush" $argv
+end
+
+function rushx
+    wrapSafeChainCommand "rushx" $argv
+end
+
 function bun
     wrapSafeChainCommand "bun" $argv
 end
@@ -76,6 +84,10 @@ function pipx
     wrapSafeChainCommand "pipx" $argv
 end
 
+function pdm
+    wrapSafeChainCommand "pdm" $argv
+end
+
 function printSafeChainWarning
     set original_cmd $argv[1]
 
@@ -112,8 +124,10 @@ function wrapSafeChainCommand
     end
 
     if type -q safe-chain
-        # If the safe-chain command is available, just run it with the provided arguments
-        safe-chain $original_cmd $cmd_args
+        # If the safe-chain command is available, just run it with the provided arguments.
+        # Unset PKG_EXECPATH for this invocation so the yao-pkg bootstrap inside the
+        # safe-chain binary doesn't mistake argv[1] for a script path to resolve against cwd.
+        env -u PKG_EXECPATH safe-chain $original_cmd $cmd_args
     else
         # If the safe-chain command is not available, print a warning and run the original command
         printSafeChainWarning $original_cmd

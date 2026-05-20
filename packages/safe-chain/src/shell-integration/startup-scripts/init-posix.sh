@@ -28,6 +28,14 @@ function pnpx() {
   wrapSafeChainCommand "pnpx" "$@"
 }
 
+function rush() {
+  wrapSafeChainCommand "rush" "$@"
+}
+
+function rushx() {
+  wrapSafeChainCommand "rushx" "$@"
+}
+
 function bun() {
   wrapSafeChainCommand "bun" "$@"
 }
@@ -81,6 +89,10 @@ function pipx() {
   wrapSafeChainCommand "pipx" "$@"
 }
 
+function pdm() {
+  wrapSafeChainCommand "pdm" "$@"
+}
+
 function printSafeChainWarning() {
   # \033[43;30m is used to set the background color to yellow and text color to black
   # \033[0m is used to reset the text formatting
@@ -101,8 +113,10 @@ function wrapSafeChainCommand() {
   fi
 
   if command -v safe-chain > /dev/null 2>&1; then
-    # If the aikido command is available, just run it with the provided arguments
-    safe-chain "$@"
+    # If the aikido command is available, just run it with the provided arguments.
+    # Unset PKG_EXECPATH so the yao-pkg bootstrap inside the safe-chain binary doesn't
+    # mistake argv[1] for a script path and try to resolve it against cwd.
+    (unset PKG_EXECPATH; safe-chain "$@")
   else
     # If the aikido command is not available, print a warning and run the original command
     printSafeChainWarning "$original_cmd"

@@ -25,6 +25,7 @@ ARG NODE_VERSION=latest
 ARG NPM_VERSION=latest
 ARG YARN_VERSION=latest
 ARG PNPM_VERSION=latest
+ARG RUSH_VERSION=latest
 ARG PYTHON_VERSION=3
 
 SHELL ["/bin/bash", "-c"]
@@ -46,6 +47,7 @@ RUN volta install node@${NODE_VERSION}
 RUN volta install npm@${NPM_VERSION}
 RUN volta install yarn@${YARN_VERSION}
 RUN volta install pnpm@${PNPM_VERSION}
+RUN volta install @microsoft/rush@${RUSH_VERSION}
 
 # Install Bun
 RUN curl -fsSL https://bun.sh/install | bash
@@ -76,6 +78,10 @@ RUN apt-get update && apt-get install -y pipx && \
         pipx ensurepath && \
         pipx install poetry && \
         ln -sf /root/.local/bin/poetry /usr/local/bin/poetry
+
+# Install PDM
+RUN pipx install pdm && \
+    ln -sf /root/.local/bin/pdm /usr/local/bin/pdm
 
 # Copy and install Safe chain
 COPY --from=builder /app/*.tgz /pkgs/

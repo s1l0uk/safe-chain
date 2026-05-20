@@ -49,6 +49,18 @@ export const knownAikidoTools = [
     internalPackageManagerName: "pnpx",
   },
   {
+    tool: "rush",
+    aikidoCommand: "aikido-rush",
+    ecoSystem: ECOSYSTEM_JS,
+    internalPackageManagerName: "rush",
+  },
+  {
+    tool: "rushx",
+    aikidoCommand: "aikido-rushx",
+    ecoSystem: ECOSYSTEM_JS,
+    internalPackageManagerName: "rushx",
+  },
+  {
     tool: "bun",
     aikidoCommand: "aikido-bun",
     ecoSystem: ECOSYSTEM_JS,
@@ -107,6 +119,12 @@ export const knownAikidoTools = [
     aikidoCommand: "aikido-pipx",
     ecoSystem: ECOSYSTEM_PY,
     internalPackageManagerName: "pipx",
+  },
+  {
+    tool: "pdm",
+    aikidoCommand: "aikido-pdm",
+    ecoSystem: ECOSYSTEM_PY,
+    internalPackageManagerName: "pdm",
   },
   // When adding a new tool here, also update the documentation for the new tool in the README.md
 ];
